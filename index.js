@@ -13,13 +13,18 @@ module.exports = function getFuncParamsName(func) {
   else if (typeof func === 'string') str = func
   else throw new Error('func type error!')
   let astEsprima
-  // str like 'function(a,b){}' will throw error
-  // see "https://github.com/jquery/esprima/issues/1701"
-  try{
-    try{
-      astEsprima=esprima.parseScript(str)
-    }catch(e){
-      astEsprima=esprima.parseScript('let x='+str)
+  try {
+    // str like 'function(a,b){}' will throw error
+    // see "https://github.com/jquery/esprima/issues/1701"
+    try {
+      astEsprima = esprima.parseScript(str)
+    } catch (e) {
+      try{
+        astEsprima = esprima.parseScript('let x=' + str)
+      }catch(e){
+        // str like "(a){...}"' will throw error
+        astEsprima = esprima.parseScript('let x=function ' + str)
+      }
     }
   }catch(e){
     throw new Error('can not parse the parameters')
@@ -29,7 +34,7 @@ module.exports = function getFuncParamsName(func) {
   let funcParams = []
   let newExpressParms = []
 
-  // The if conditions below do not merge ,we need to check the handle process about each "SHAPE" of function
+  // The if conditions below do not merge ,we need to check the handle process about each "SHAPE" of function.
 
   // process        shape
   // 1->3->5->7   'x=class{ constructor(e,f){}; method(cc,dd){}}'
@@ -85,17 +90,22 @@ module.exports = function getFuncParamsName(func) {
   function iterParam(funcParams){
     let validP=[]
     funcParams.forEach(o=>{
+      // loop to find 'Identifier'
       while(o.type!=='Identifier'){
+        // if o is Array, break and start new loop
         if(Array.isArray(o) && o.length) return validP.push(iterParam(o))
+        // like ([a,b]=[1,2])
         if(o.type==="ArrayPattern") o=o.elements
+        // like ({x,y}={x:1,y:2})
         else if(o.type==="ObjectPattern") o=o.properties
+        // like ([...params])
         else if(o.type==="RestElement"){
           o=o.argument
           o.name='...'+o.name
-        } else{
-          if(o.type==="Property")o=o.key
-          else o=o.left
-        }
+        // exist [a,b] or {x,y}, here first, then 'ArrayPattern' or 'ObjectPattern'
+        } else if(o.type==="Property")o=o.key
+        // like (x=a)
+        else o=o.left
       }
       validP.push(o.name)
     })
@@ -103,15 +113,15 @@ module.exports = function getFuncParamsName(func) {
   }
 
   if(funcParams.length){
-    // console.log(funcParams)
     validParam=iterParam(funcParams)
   } else{
+    // 针对 new Function的参数，
     newExpressParms.slice(0,-1).forEach(o=>{
       let param=o.value.replace(reComments,'')
       param=param.split('=')[0]
       if(param)validParam.push(param)
     })
   }
-  // console.log(validParam)
+
   return validParam.filter(Boolean)
 }

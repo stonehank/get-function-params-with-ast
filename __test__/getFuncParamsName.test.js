@@ -43,8 +43,8 @@ let testListString=[
         method(cc,dd){}
       }`,
   `let x=class{
-        constructor(a,b){}
         method(cc,dd){}
+        constructor(a,b){}
       }`,
   `let x=class{
         method(cc,dd){}
@@ -54,7 +54,7 @@ let testListString=[
     method(cc,dd){}
   }`,
   `let funcName=function(a=function(b){}){}`,
-  `function funcName(a=function(b){function inner(b){function inner(b){function inner(b){function inner(b){function inner(b){function inner(b){}}}}}}}){}`,
+  `function funcName(a=function(a=b){function inner(b=c){function inner(c=a){function inner(d=b){function inner(b){function inner(d){function inner(a){}}}}}}}){}`,
   `async function funcName(asy1,asy2){let x=1;await doSomeWork(x,y)}`,
   `let funcName=async function(asy1,asy2){let x=1;await doSomeWork(x,y)}`,
   `funcName=async function(asy1,asy2){let x=1;await doSomeWork(x,y)}`,
@@ -76,6 +76,25 @@ let testListString=[
   'function x(...arg){}',
   'function x({a:[...args],b:{c:{d:{e:[...another]}}}}){}',
   'function x([a,[...b]]){}',
+  `function x([a,b],{c,d}){}`,
+
+  /*------problem-------*/
+  // 这里处理IIFE字符串模式会有问题，如果搜索最终返回值，可能需要递归处理，
+  // 例如：(function(){return (function(){return (function(){return ...})()})()})()
+  // `(function(){return function(a,b){}})()`,
+  // 暂时用普通函数代替
+  `function(a,b){}`,
+  /*------problem-------*/
+
+  'function (){}',
+  'function (a,b,c){}',
+  'function (a /* = 1 */, b /* = true */) {}',
+  'function (handle, fmt /*, {}*/) {}',
+  'function ( a, b = 1, c ){}',
+  'function (a=4*(5/3), b) {}',
+  'function (a /* function() yes */, \n /* no, */b)/* omg! */{}',
+  'function ( A, b \n,c ,d \n ) \n {}',
+  ` window.foo = function(a,b){}`,
 ]
 
 
@@ -119,8 +138,8 @@ let testListFunc=[
     method(cc,dd){}
   },
   class{
-    constructor(a,b){}
     method(cc,dd){}
+    constructor(a,b){}
   },
   class{
     method(cc,dd){}
@@ -130,7 +149,7 @@ let testListFunc=[
     method(cc,dd){}
   },
   function(a=function(b){}){},
-  function funcName(a=function(b){function inner(b){function inner(b){function inner(b){function inner(b){function inner(b){function inner(b){}}}}}}}){},
+  function funcName(a=function(a=b){function inner(b=c){function inner(c=a){function inner(d=b){function inner(b){function inner(d){function inner(a){}}}}}}}){},
   async function funcName(asy1,asy2){let x=1;await doSomeWork(x,y)},
   funcName=async function(asy1,asy2){let x=1;await doSomeWork(x,y)},
   funcName=async function funcName(asy1,asy2){let x=1;await doSomeWork(x,y)},
@@ -156,6 +175,20 @@ let testListFunc=[
   function x(...arg){},
   function x({a:[...args],b:{c:{d:{e:[...another]}}}}){},
   function x([a,[...b]]){},
+  function x([a,b],{c,d}){},
+  (function(){return function(a,b){}})(),
+  function (){},
+  function (a,b,c){},
+  function (a /* = 1 */, b /* = true */) {},
+  function (handle, fmt /*, {}*/) {},
+  function ( a, b = 1, c ){},
+  function (a=4*(5/3), b) {},
+  function (a /* function() yes */,
+             /* no, */b)/* omg! */{},
+  function ( A, b
+    ,c ,d  )
+  {},
+  window.foo = function(a,b){},
 ]
 
 let answer=[
@@ -215,17 +248,56 @@ let answer=[
   ['...arg'],
   [['a','b']],
   [['a',['...b']]],
+  [['a','b'],['c','d']],
+  ["a","b"],
+  [],
+  [ "a", "b", "c" ],
+  [ "a", "b" ],
+  [ "handle", "fmt" ],
+  [ "a", "b", "c" ],
+  [ "a", "b" ],
+  [ "a", "b" ],
+  [ "A", "b", "c", "d" ],
+  ["a","b"],
 ]
 
 
 for(let i=0;i<testListString.length;i++){
-  test(`get function(string) ${i} parameters' name`, () => {
+  test(`get function(string) ${i} parameters' name, which is ${testListString[i]}`, () => {
     expect(getFuncParamsName(testListString[i])).toEqual(answer[i])
   });
 }
 
 for(let i=0;i<testListFunc.length;i++){
-  test(`get function(string) ${i} parameters' name`, () => {
+  test(`get function(function) ${i} parameters' name, which is ${testListFunc[i]}`, () => {
     expect(getFuncParamsName(testListFunc[i])).toEqual(answer[i])
   });
 }
+
+
+
+  test(`get obj property(function) parameters`, () => {
+    let collection = {
+      items: [],
+      add(...items) {
+        this.items.push(...items);
+      },
+      get(index) {
+        return this.items[index];
+      }
+    };
+    expect(getFuncParamsName(collection.add)).toEqual(["...items"])
+    expect(getFuncParamsName(collection.get)).toEqual(['index'])
+  });
+
+test(`get Generator next.value (function) parameters`, () => {
+  let obj = {
+    *indexGenerator() {
+      while(true) {
+        yield function(a,b){}
+      }
+    }
+  }
+  let g = obj.indexGenerator();
+  expect(getFuncParamsName(g.next().value)).toEqual(["a","b"])
+});
