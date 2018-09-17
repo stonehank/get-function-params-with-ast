@@ -5,17 +5,27 @@
 * 100+ tests
 * 使用`AST`树，轻松扩展
 
+------------
 
 ### 安装
 
 `npm install get-function-params-with-ast`
 
+---------
+
 ### 使用
 
 `getFuncParamsName(func:<String|Function>):<Array>`
 
-### 测试案例
+--------
 
+### 测试
+
+`npm run test`
+
+--------
+
+### 测试案例
 ```
 function(){}                                      // []
 function(a,b){}                                   // ['a','b']
@@ -35,8 +45,12 @@ function x(...arg){}                              // ['...arg']
 
 * 复杂测试案例
 ```
-new Function ("a=5","b",/* c=7 ,*//* d ,*/"e=function(x,y){}","f=5","console.log(a,b)")   // ['a','b','e','f']
-function funcName(a=function(a=b){function inner(b=c){function inner(c=a){function inner(d=b){function inner(b){function inner(d){function inner(a){}}}}}}}){}   // ['a']
-function x(a=5,b="a",c=function(x=1,y){console.log(x=function(i=8,j){})},d={x:1,y:2,z:'x=6'},e=x=>7,f=['3=5','x.1','y,2',1],g=(x,y)=>{let z=(i,j=6)=>{}},h){}   // ['a','b','c','d','e','f','g','h']
-function x({a:[...args],b:{c:{d:{e:[...another]}}}}){}   // [['a','b']]
+new Function ("a=5","b",/* c=7 ,*//* d ,*/"e=function(x,y){}","f=5","console.log(a,b)")   
+// ['a','b','e','f']
+function funcName(a=function(a=b){function inner(b=c){function inner(c=a){function inner(d=b){function inner(b){function inner(d){function inner(a){}}}}}}}){}   
+// ['a']
+function x(a=5,b="a",c=function(x=1,y){console.log(x=function(i=8,j){})},d={x:1,y:2,z:'x=6'},e=x=>7,f=['3=5','x.1','y,2',1],g=(x,y)=>{let z=(i,j=6)=>{}},h){}   
+// ['a','b','c','d','e','f','g','h']
+function x({a:[...args],b:{c:{d:{e:[...another]}}}}){}  
+ // [['a','b']]
 ```
