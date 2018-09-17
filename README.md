@@ -1,3 +1,7 @@
+[中文说明](https://github.com/stonehank/get-function-params-with-ast/blob/master/README-CN.md)
+
+------
+
 ## Get function parameters with any "shape".
 
 ### Feature

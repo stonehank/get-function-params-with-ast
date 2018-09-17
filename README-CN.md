@@ -1,3 +1,8 @@
+[English](https://github.com/stonehank/get-function-params-with-ast/blob/master/README.md)
+
+
+-----------
+
 ## 查找函数形参名称，兼容任意`function`样式
 
 ### 特性
