@@ -1,4 +1,4 @@
-## Get parameters name for any "shape" of function
+## Get function parameters with any "shape".
 
 ### Feature
 
