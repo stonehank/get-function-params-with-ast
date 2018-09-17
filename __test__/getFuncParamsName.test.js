@@ -275,7 +275,6 @@ for(let i=0;i<testListFunc.length;i++){
 }
 
 
-
   test(`get obj property(function) parameters`, () => {
     let collection = {
       items: [],
