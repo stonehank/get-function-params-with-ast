@@ -4,11 +4,15 @@
   "description": "Get function parameters with any \"shape\".",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest && codecov"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/stonehank/get-function-params-with-ast"
+  },
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
   },
   "keywords": [
     "params",

@@ -8,7 +8,7 @@
 
  * Support ES6, with `default parameters`, `spread syntax`, `destructuring assignment`, `new operator`,
  `arrow function`, `async function`, `function*`,`class expression`, etc.
- * 100 plus tests.
+ * 100+ tests.
  * Analysis with `AST` by [esprima](http://esprima.org/index.html), easy scalable.
  
 ### Install
