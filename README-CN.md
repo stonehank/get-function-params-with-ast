@@ -1,25 +1,21 @@
-## Get parameters name for any "shape" of function
+## 查找函数形参名称，兼容任意`function`样式
 
-### Feature
+### 特性
+* 支持ES6模式，参数默认值，扩展运算符，解构参数，`new Function`，箭头函数，async，generators，class等等
+* 100+ tests
+* 使用`AST`树，轻松扩展
 
- * Support ES6, with `default parameters`, `spread syntax`, `destructuring assignment`, `new operator`,
- `arrow function`, `async function`, `function*`,`class expression`, etc.
- * 100 plus tests.
- * Analysis with `AST` by [esprima](http://esprima.org/index.html), easy scalable.
- 
-### Install
+
+### 安装
 
 `npm install get-function-params-with-ast`
 
-----
-
-### Usage
+### 使用
 
 `getFuncParamsName(func:<String|Function>):<Array>`
 
-----------
+### 测试案例
 
-#### Example
 ```
 function(){}                                      // []
 function(a,b){}                                   // ['a','b']
@@ -37,7 +33,7 @@ function x([a,b]=[1,2],{c,d}={c:7,y:2}){}         // [['a','b'],['c','d']]
 function x(...arg){}                              // ['...arg']
 ```
 
-* Something special
+* 复杂测试案例
 ```
 new Function ("a=5","b",/* c=7 ,*//* d ,*/"e=function(x,y){}","f=5","console.log(a,b)")   // ['a','b','e','f']
 function funcName(a=function(a=b){function inner(b=c){function inner(c=a){function inner(d=b){function inner(b){function inner(d){function inner(a){}}}}}}}){}   // ['a']
