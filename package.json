@@ -1,6 +1,6 @@
 {
   "name": "get-function-params-with-ast",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Get function parameters with any \"shape\".",
   "main": "index.js",
   "scripts": {
