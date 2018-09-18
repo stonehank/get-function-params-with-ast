@@ -95,6 +95,9 @@ let testListString=[
   'function (a /* function() yes */, \n /* no, */b)/* omg! */{}',
   'function ( A, b \n,c ,d \n ) \n {}',
   ` window.foo = function(a,b){}`,
+  // `eval("function x(a,b){}")` eval字符串不进行字符串处理
+  eval("(function(){return function(a,b){}})()"),
+  `Function("a","b","console.log(x,y)")`
 ]
 
 
@@ -189,6 +192,8 @@ let testListFunc=[
     ,c ,d  )
   {},
   window.foo = function(a,b){},
+  eval("(function(){return function(a,b){}})()"),
+  Function("a","b","console.log(x,y)")
 ]
 
 let answer=[
@@ -259,6 +264,8 @@ let answer=[
   [ "a", "b" ],
   [ "A", "b", "c", "d" ],
   ["a","b"],
+  ["a","b"],
+  ["a","b"],
 ]
 
 
@@ -299,4 +306,14 @@ test(`get Generator next.value (function) parameters`, () => {
   }
   let g = obj.indexGenerator();
   expect(getFuncParamsName(g.next().value)).toEqual(["a","b"])
+});
+
+
+test(`throw error while parameter is error type`, () => {
+  expect(getFuncParamsName.bind(null,{x:1})).toThrow('func type error!')
+  expect(getFuncParamsName).toThrow('func type error!')
+});
+
+test(`throw error while can not parse`, () => {
+  expect(getFuncParamsName.bind(null,"()()=>{}")).toThrow("can not parse the parameters")
 });

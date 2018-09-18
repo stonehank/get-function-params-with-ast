@@ -37,18 +37,18 @@ module.exports = function getFuncParamsName(func) {
   // The if conditions below do not merge ,we need to check the handle process about each "SHAPE" of function.
 
   // process        shape
-  // 1->3->5->7   'x=class{ constructor(e,f){}; method(cc,dd){}}'
-  // 1->3->6      'x=new Function ("a=5","b","console.log(a,b)")'
-  // 1->3->7      'x=function(a,b){}'
-  // 1->3->8      'x=e=>{}'
-  // 1->6         'new Function ("a=5","b","console.log(a,b)")',
-  // 1->8         'e=>{}'
-  // 2->5->7      'let x=class{ constructor(a,b){}; method(cc,dd){}}'
-  // 2->6         'let x=new Function ("a=5","b","console.log(a,b)")'
-  // 2->7         'let x=function(aa,cc){}'
-  // 2->8         'let x=(e=5,b)=>{}'
-  // 4->7         'class x{ constructor(a,b){}; method(cc,dd){}}'
-  // 9            'function x(a,b,c){}'
+  // 1->3->4->6   'x=class{ constructor(e,f){}; method(cc,dd){}}'
+  // 1->3->5      'x=new Function ("a=5","b","console.log(a,b)")'
+  // 1->3->6      'x=function(a,b){}'
+  // 1->3->7      'x=e=>{}'
+  // 1->5         'new Function ("a=5","b","console.log(a,b)")',
+  // 1->7         'e=>{}'
+  // 2->4->6      'let x=class{ constructor(a,b){}; method(cc,dd){}}'
+  // 2->5         'let x=new Function ("a=5","b","console.log(a,b)")'
+  // 2->6         'let x=function(aa,cc){}'
+  // 2->7         'let x=(e=5,b)=>{}'
+  // 4->6         'class x{ constructor(a,b){}; method(cc,dd){}}'
+  // 8            'function x(a,b,c){}'
 
   // PS: 'function(a){}' will transform to `let x=function(a){}'，which process is 2->6
 
@@ -59,7 +59,7 @@ module.exports = function getFuncParamsName(func) {
   // 3
   if (node.type === "AssignmentExpression") node = node.right
   // 4
-  if (node.type === "ClassDeclaration") {
+  if (node.type === "ClassDeclaration" || node.type === "ClassExpression") {
     node = node.body.body
     for (let i = 0; i < node.length; i++)
       if (node[i].kind === "constructor") {
@@ -67,22 +67,14 @@ module.exports = function getFuncParamsName(func) {
         break
       }
   }
+
   // 5
-  if (node.type === "ClassExpression") {
-    node = node.body.body
-    for (let i = 0; i < node.length; i++)
-      if (node[i].kind === "constructor") {
-        node = node[i].value;
-        break
-      }
-  }
+  if (node.type === "NewExpression"|| node.type==="CallExpression") newExpressParms = node.arguments
   // 6
-  if (node.type === "NewExpression") newExpressParms = node.arguments
-  // 7
   if (node.type === "FunctionExpression") funcParams = node.params
-  // 8
+  // 7
   if (node.type === "ArrowFunctionExpression") funcParams = node.params
-  // 9
+  // 8
   if (node.type === "FunctionDeclaration") funcParams = node.params
 
 

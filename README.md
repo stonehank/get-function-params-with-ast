@@ -2,7 +2,13 @@
 
 ------
 
-## Get function parameters with any "shape".
+### Get function parameters with any "shape".
+
+[![Build Status](https://travis-ci.org/stonehank/get-function-params-with-ast.svg?branch=master)](https://travis-ci.org/stonehank/get-function-params-with-ast)
+[![npm](https://img.shields.io/npm/v/get-function-params-with-ast.svg)](https://www.npmjs.com/package/get-function-params-with-ast)
+[![Codecov](https://codecov.io/gh/stonehank/get-function-params-with-ast/branch/master/graph/badge.svg)](https://codecov.io/gh/stonehank/get-function-params-with-ast)
+
+------
 
 ### Feature
 
